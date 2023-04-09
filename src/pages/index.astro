@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import DiceRoller from "../components/DiceRoller.jsx";
+---
+
+<Layout title='Hitson - Dice Roller Application'>
+  <main>
+    <h1>Hits on <span class='text-gradient'>Dice Rolla</span></h1>
+    <div>
+      <DiceRoller client:load />
+    </div>
+  </main>
+</Layout>
