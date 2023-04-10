@@ -8,9 +8,17 @@ import {
 import NumberSelector from "./NumberSelector";
 
 const fetchRoll = async (options) => {
-  const { rolls, amount, sides, up } = options;
+  const { rolls, amount, sides, up, prevRoll, reroll = false } = options;
+  let endpoint = "";
+  //console.log(rolls(), amount(), sides(), up(), prevRoll() || "", reroll);
+  if (reroll) {
+    console.log("reroll", reroll, "prev", prevRoll());
+    endpoint = `?reroll=${reroll}&prev=${prevRoll()}&sort_min=${up()}`;
+  } else {
+    endpoint = `?amount=${amount()}&sides=${sides()}&rolls=${rolls()}&sort_min=${up()}`;
+  }
 
-  const endpoint = `?amount=${amount()}&sides=${sides()}&rolls=${rolls()}&sort_min=${up()}`;
+  //const endpoint = `?amount=${amount()}&sides=${sides()}&rolls=${rolls()}&sort_min=${up()}`;
   const url = `https://wp.darrylch.com/wp-json/dch-json/v1/dice_roller${endpoint}`;
   //console.log(url);
   const result = await fetch(url);
@@ -67,6 +75,15 @@ export default function DiceRoller() {
     setPrevRoll(false);
   };
 
+  const handleRerollFetch = (r) => {
+    //console.log(r, prevRoll(), up());
+    setTrigger({
+      reroll: r,
+      prevRoll: prevRoll,
+      up: up,
+    });
+  };
+
   createEffect(() => {
     if (data()) {
       if (data.state === "ready") {
@@ -75,8 +92,8 @@ export default function DiceRoller() {
       if (data.loading) {
         setPrevRoll(false);
       }
-      setPrevRoll(data().rolls[0].roll.toString());
-      console.log(prevRoll());
+      setPrevRoll(data()?.rolls[0]?.roll.toString());
+      //console.log(prevRoll());
     }
   }, data());
   return (
@@ -114,6 +131,7 @@ export default function DiceRoller() {
       </div>
       <div className='flex py-4'>
         <button onClick={handleFetch}>Roll It!</button>
+        <button onClick={() => handleRerollFetch(1)}>ReRoll 1s!</button>
       </div>
 
       <Suspense fallback={<div>Loading... Suspense</div>}>
@@ -123,10 +141,23 @@ export default function DiceRoller() {
               {(roll, i) => (
                 <div className='rolls-results'>
                   <div className='rolls flex flex-wrap'>
+                    <Show when={roll.previous_roll} fallback={<p>Results</p>}>
+                      Reroll
+                    </Show>
                     {roll.roll.map((r) => (
                       <DiceFace up={up} num={r} />
                     ))}
                   </div>
+                  <Show when={roll.previous_roll}>
+                    <div className='rolls flex flex-wrap'>
+                      <p>Previous Roll</p>
+                      {roll.previous_roll.map((p) => (
+                        <DiceFace up={up} num={p} />
+                      ))}
+                    </div>
+                  </Show>
+                  {/* {roll?.previous_roll &&
+                    roll.previous_roll.map((p) => <DiceFace up={up} num={p} />)} */}
                   <div className='roll-groups flex'>
                     {Object.keys(roll.roll_meta.roll_groups).map(
                       (key, index) => (
