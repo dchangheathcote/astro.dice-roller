@@ -6,6 +6,7 @@ import RollSelector from "./RollSelector";
 const fetchRoll = async (options) => {
   const { rolls, amount, sides, up, prevRoll, reroll = false } = options;
   let endpoint = "";
+  //do some validation
   if (reroll) {
     endpoint = `?reroll=${reroll}&prev=${prevRoll()}&sort_min=${up()}`;
   } else {

@@ -4,7 +4,7 @@ import { For, Suspense } from "solid-js";
 export default function RollResults(props) {
   const { data, up } = props;
   return (
-    <Suspense fallback={<div>Loading... Suspense</div>}>
+    <Suspense fallback={<div>Rolling... Suspense</div>}>
       <Show when={!data.error} fallback={<div>{data.error.message}</div>}>
         <div className='rolls-results-container'>
           <For each={data()?.rolls}>
