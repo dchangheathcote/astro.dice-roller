@@ -1,6 +1,7 @@
 import { createResource, createSignal, createEffect } from "solid-js";
 import NumberSelector from "./NumberSelector";
 import RollResults from "./RollResults";
+import RollSelector from "./RollSelector";
 
 const fetchRoll = async (options) => {
   const { rolls, amount, sides, up, prevRoll, reroll = false } = options;
@@ -63,8 +64,20 @@ export default function DiceRoller() {
       setPrevRoll(data()?.rolls[0]?.roll.toString());
     }
   }, data());
+
   return (
     <div id='dice-roller'>
+      <RollSelector
+        amountDefault={amountDefault}
+        amount={amount}
+        setAmount={setAmount}
+        sidesDefault={sidesDefault}
+        sides={sides}
+        setSides={setSides}
+        minUp={minUp}
+        up={up}
+        setUp={setUp}
+      />
       <div className='flex'>
         <NumberSelector
           title='# of Rolls'

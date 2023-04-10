@@ -8,22 +8,26 @@ export default function RollResults(props) {
       <Show when={!data.error} fallback={<div>{data.error.message}</div>}>
         <div className='rolls-results-container'>
           <For each={data()?.rolls}>
-            {(roll, i) => (
+            {(roll) => (
               <div className='rolls-results'>
-                <div className='rolls flex flex-wrap'>
+                <div>
                   <Show when={roll.previous_roll} fallback={<p>Results</p>}>
                     <p>Reroll</p>
                   </Show>
-                  {roll.roll.map((r) => (
-                    <DiceFace up={up} num={r} />
-                  ))}
+                  <div className='rolls flex flex-wrap'>
+                    {roll.roll.map((r) => (
+                      <DiceFace up={up} num={r} />
+                    ))}
+                  </div>
                 </div>
                 <Show when={roll.previous_roll}>
-                  <div className='rolls flex flex-wrap'>
+                  <div>
                     <p>Previous Roll</p>
-                    {roll.previous_roll.map((p) => (
-                      <DiceFace up={up} num={p} />
-                    ))}
+                    <div className='rolls flex flex-wrap'>
+                      {roll.previous_roll.map((p) => (
+                        <DiceFace up={up} num={p} />
+                      ))}
+                    </div>
                   </div>
                 </Show>
                 <div className='roll-groups flex'>
