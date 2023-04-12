@@ -10,7 +10,7 @@ const fetchRoll = async (options) => {
   if (reroll) {
     endpoint = `?reroll=${reroll}&prev=${prevRoll()}&sort_min=${up()}`;
   } else {
-    endpoint = `?amount=${amount()}&sides=${sides()}&rolls=${rolls()}&sort_min=${up()}`;
+    endpoint = `?amount=${amount}&sides=${sides()}&rolls=${rolls()}&sort_min=${up()}`;
   }
   const url = `https://wp.darrylch.com/wp-json/dch-json/v1/dice_roller${endpoint}`;
   const result = await fetch(url);
@@ -34,12 +34,15 @@ export default function DiceRoller() {
   const [trigger, setTrigger] = createSignal(false);
   const [data] = createResource(trigger, fetchRoll);
 
+  const [nextAmount, setNextAmount] = createSignal(false);
   const [prevRoll, setPrevRoll] = createSignal(false);
 
-  const handleFetch = () => {
+  const handleFetch = (n = false) => {
+    const rollAmount = n || amount();
+    //console.log("hello", n, amount(), rollAmount);
     setTrigger({
       rolls: rolls,
-      amount: amount,
+      amount: rollAmount,
       sides: sides,
       up: up,
     });
@@ -57,6 +60,7 @@ export default function DiceRoller() {
   createEffect(() => {
     if (data()) {
       if (data.state === "ready") {
+        setNextAmount(data()?.rolls[0]?.roll_meta?.min?.gt);
         setTrigger(false);
       }
       if (data.loading) {
@@ -64,6 +68,7 @@ export default function DiceRoller() {
       }
       setPrevRoll(data()?.rolls[0]?.roll.toString());
     }
+    console.log(nextAmount());
   }, data());
 
   return (
@@ -111,10 +116,9 @@ export default function DiceRoller() {
         />
       </div>
       <div className='flex py-4'>
-        <button onClick={handleFetch}>Roll It!</button>
-        <button onClick={() => handleRerollFetch(1)}>ReRoll 1s!</button>
+        <button onClick={() => handleFetch()}>Roll It!</button>
       </div>
-      <RollResults data={data} up={up} />
+      <RollResults data={data} up={up} handleRerollFetch={handleRerollFetch} />
     </div>
   );
 }

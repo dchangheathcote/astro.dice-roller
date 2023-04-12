@@ -10,39 +10,51 @@ export default function RollResults(props) {
           <For each={data()?.rolls}>
             {(roll) => (
               <div className='rolls-results'>
-                <div>
-                  <Show when={roll.previous_roll} fallback={<p>Results</p>}>
-                    <p>Reroll</p>
-                  </Show>
+                <div className='rolls-dice'>
+                  <p className='rolls-title'>
+                    {roll.previous_roll && "Reroll "}Results
+                  </p>
                   <div className='rolls flex flex-wrap'>
                     {roll.roll.map((r) => (
                       <DiceFace up={up} num={r} />
                     ))}
                   </div>
                 </div>
-                <Show when={roll.previous_roll}>
-                  <div>
-                    <p>Previous Roll</p>
-                    <div className='rolls flex flex-wrap'>
-                      {roll.previous_roll.map((p) => (
-                        <DiceFace up={up} num={p} />
-                      ))}
-                    </div>
-                  </div>
-                </Show>
                 <div className='roll-groups flex'>
-                  {Object.keys(roll.roll_meta.roll_groups).map((key, index) => (
-                    <div className='group-value'>
-                      {key}s : {roll.roll_meta.roll_groups[key]}
-                    </div>
+                  {roll.roll_meta.roll_groups.hasOwnProperty(1) &&
+                    !roll?.previous_roll && (
+                      <button onClick={() => props.handleRerollFetch(1)}>
+                        ReRoll 1s!
+                      </button>
+                    )}
+                  {Object.keys(roll.roll_meta.roll_groups).map((key) => (
+                    <>
+                      <div
+                        className={`${+key >= up() ? "up " : ""}group-value`}
+                      >
+                        {key}s : {roll.roll_meta.roll_groups[key]}
+                      </div>
+                    </>
                   ))}
                 </div>
                 <div className='roll-min'>
                   <div>
-                    {roll.roll_meta.min_value} up: {roll.roll_meta.min.gt}
+                    <button>
+                      Roll {roll.roll_meta.min.gt} {roll.roll_meta.min_value}Ups
+                    </button>
                   </div>
                   <div>lesser: {roll.roll_meta.min.lt}</div>
                 </div>
+                <Show when={roll.previous_roll}>
+                  <div className='rolls-dice'>
+                    <p className='rolls-title'>Original Roll</p>
+                    <div className='rolls flex flex-wrap'>
+                      <For each={roll.previous_roll}>
+                        {(p) => <DiceFace up={up} num={p} />}
+                      </For>
+                    </div>
+                  </div>
+                </Show>
               </div>
             )}
           </For>
