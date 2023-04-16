@@ -39,7 +39,6 @@ export default function DiceRoller() {
 
   const handleFetch = (n = false) => {
     const rollAmount = n || amount();
-    //console.log("hello", n, amount(), rollAmount);
     setTrigger({
       rolls: rolls,
       amount: rollAmount,
@@ -65,10 +64,10 @@ export default function DiceRoller() {
       }
       if (data.loading) {
         setPrevRoll(false);
+        setNextAmount(false);
       }
       setPrevRoll(data()?.rolls[0]?.roll.toString());
     }
-    console.log(nextAmount());
   }, data());
 
   return (
@@ -118,7 +117,12 @@ export default function DiceRoller() {
       <div className='flex py-4'>
         <button onClick={() => handleFetch()}>Roll It!</button>
       </div>
-      <RollResults data={data} up={up} handleRerollFetch={handleRerollFetch} />
+      <RollResults
+        data={data}
+        up={up}
+        nextAmount={nextAmount}
+        handleRerollFetch={handleRerollFetch}
+      />
     </div>
   );
 }

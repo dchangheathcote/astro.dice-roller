@@ -1,6 +1,25 @@
 import DiceFace from "./DiceFace";
 import { For, Suspense } from "solid-js";
 
+function RollsGroupButton({ className, key, keyValue }) {
+  return (
+    <button className={className}>
+      {keyValue} <span>{key}s</span>
+    </button>
+  );
+}
+function RollsGroup() {}
+function RollsDice({ title, roll, up }) {
+  return (
+    <div className='rolls-dice'>
+      <p className='rolls-title'>{title}</p>
+      <div className='rolls flex flex-wrap justify-center'>
+        <For each={roll}>{(p) => <DiceFace up={up} num={p} />}</For>
+      </div>
+    </div>
+  );
+}
+
 export default function RollResults(props) {
   const { data, up } = props;
   return (
@@ -10,17 +29,12 @@ export default function RollResults(props) {
           <For each={data()?.rolls}>
             {(roll) => (
               <div className='rolls-results'>
-                <div className='rolls-dice'>
-                  <p className='rolls-title'>
-                    {roll.previous_roll && "Reroll "}Results
-                  </p>
-                  <div className='rolls flex flex-wrap'>
-                    {roll.roll.map((r) => (
-                      <DiceFace up={up} num={r} />
-                    ))}
-                  </div>
-                </div>
-                <div className='roll-groups flex'>
+                <RollsDice
+                  title={roll.previous_roll ? "Reroll Results" : "Results"}
+                  roll={roll.roll}
+                  up={up}
+                />
+                <div className='button-group roll-groups flex'>
                   {roll.roll_meta.roll_groups.hasOwnProperty(1) &&
                     !roll?.previous_roll && (
                       <button onClick={() => props.handleRerollFetch(1)}>
@@ -28,32 +42,26 @@ export default function RollResults(props) {
                       </button>
                     )}
                   {Object.keys(roll.roll_meta.roll_groups).map((key) => (
-                    <>
-                      <div
-                        className={`${+key >= up() ? "up " : ""}group-value`}
-                      >
-                        {key}s : {roll.roll_meta.roll_groups[key]}
-                      </div>
-                    </>
+                    <RollsGroupButton
+                      className={`group-value${+key >= up() ? " active" : ""}`}
+                      key={key}
+                      keyValue={roll.roll_meta.roll_groups[key]}
+                    />
                   ))}
-                </div>
-                <div className='roll-min'>
-                  <div>
-                    <button>
-                      Roll {roll.roll_meta.min.gt} {roll.roll_meta.min_value}Ups
-                    </button>
-                  </div>
-                  <div>lesser: {roll.roll_meta.min.lt}</div>
+                  <button
+                    onClick={() => {
+                      console.log(props.nextAmount());
+                    }}
+                  >
+                    Roll {roll.roll_meta.min.gt} {roll.roll_meta.min_value}Ups
+                  </button>
                 </div>
                 <Show when={roll.previous_roll}>
-                  <div className='rolls-dice'>
-                    <p className='rolls-title'>Original Roll</p>
-                    <div className='rolls flex flex-wrap'>
-                      <For each={roll.previous_roll}>
-                        {(p) => <DiceFace up={up} num={p} />}
-                      </For>
-                    </div>
-                  </div>
+                  <RollsDice
+                    title={`Original Roll`}
+                    roll={roll.previous_roll}
+                    up={up}
+                  />
                 </Show>
               </div>
             )}

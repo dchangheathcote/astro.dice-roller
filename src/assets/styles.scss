@@ -286,8 +286,11 @@ h1 {
 }
 .roll-groups {
   gap: 0.5rem;
+  padding: 1rem 0;
   .group-value {
-    border: 1px solid black;
     padding: 0.25rem 0.5rem;
   }
+  // .active {
+  //   background-color: green;
+  // }
 }
